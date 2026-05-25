@@ -10,7 +10,7 @@ GROQ_API_KEY = "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"
 
 # 1. Page Configuration & Layout Rules
 st.set_page_config(
-    page_title="Aegis Core // Diagnostic Workspace",
+    page_title="Aegis Core - Diagnostic Workspace",
     page_icon="🩺",
     layout="wide",
     initial_sidebar_state="expanded"
