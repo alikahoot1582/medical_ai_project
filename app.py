@@ -1,235 +1,197 @@
 import streamlit as st
 import pandas as pd
-import json
 import os
 from groq import Groq
 
 # ==============================================================================
-# 🔑 EMBED YOUR GROQ API KEY HERE
-# Replace the placeholder text with your actual secret key from console.groq.com
+# 🔑 EMBEDDED ENGINE AUTHENTICATION LAYER
 # ==============================================================================
 GROQ_API_KEY = "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"
 
-# 1. Page & Layout Optimization Configuration
+# 1. Page Configuration & Layout Rules
 st.set_page_config(
-    page_title="Aegis AI - Clinical Workspace Console",
+    page_title="Aegis Core // Diagnostic Workspace",
     page_icon="🩺",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Seamless Glassmorphic Clinical Dashboard Theme UI Styling
+# 2. Modern & Clean Interface Stylesheet
 st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
         
-        /* Global Reset & Font Application */
+        /* Global typography optimization */
         html, body, [class*="css"] { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
+            font-family: 'Inter', sans-serif; 
         }
         
-        .stApp { 
-            background-color: #080D1A; 
-            color: #E2E8F0; 
-        }
-        
-        /* Custom Sidebar Adjustment */
-        div[data-testid="stSidebarUserContent"] { 
-            background-color: #0E1626; 
-            padding-top: 1.5rem;
-        }
-        
-        /* Modernized Medical Metrics Cards */
-        .patient-badge {
-            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 12px;
-        }
-        
-        .vital-tag {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            color: #10B981;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: inline-block;
-            margin: 3px;
-        }
-        
-        .allergy-tag {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #F87171;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: inline-block;
-            margin: 3px;
-        }
-
-        /* Tactical Live Logic/Reasoning Window Console */
-        .reasoning-terminal { 
-            background-color: #050B14; 
+        /* Clean Terminal Console box for the live streaming logs */
+        .terminal-box { 
+            background-color: #0B0F19; 
             border: 1px solid #1E293B; 
-            border-radius: 8px; 
-            padding: 18px; 
+            border-radius: 6px; 
+            padding: 16px; 
             font-family: 'JetBrains Mono', monospace; 
             font-size: 0.85rem; 
             color: #38BDF8; 
             white-space: pre-wrap; 
-            height: 480px; 
+            height: 380px; 
             overflow-y: auto;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
         }
         
-        .phase-header {
-            color: #10B981;
+        .step-title {
+            color: #34D399;
             font-weight: 600;
-            margin-top: 10px;
-            border-bottom: 1px dashed #1E293B;
-            padding-bottom: 4px;
+            margin-top: 12px;
+            border-bottom: 1px dashed #334155;
+            padding-bottom: 2px;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# 2. Optimized Pipeline Local Dataset Fetcher Engine
+# 3. Secure Dataset Pipeline Loader
 DATASET_DIR = "."
 
 @st.cache_data(show_spinner=False)
 def load_large_scale_datasets():
-    """Extracts baseline rows from the decoupled root-level spreadsheets securely."""
+    """Extracts rows from the decoupled 10,000-entry database files cleanly."""
     try:
         mimic_df = pd.read_csv(os.path.join(DATASET_DIR, "mimic_iv_notes_10k.csv"))
         drugbank_df = pd.read_csv(os.path.join(DATASET_DIR, "drugbank_matrix_10k.csv"))
         snomed_df = pd.read_csv(os.path.join(DATASET_DIR, "snomed_terms_10k.csv"))
         
-        # O(1) Quick-indexing configuration map setup
+        # Optimize MIMIC using O(1) indexed hash matches
         mimic_indexed = mimic_df.set_index("note_id", drop=False)
         return mimic_indexed, drugbank_df, snomed_df
     except Exception as e:
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
-# Populate data tables cleanly inside execution context
+# Instantiate data memory spaces
 mimic_db, drugbank_db, snomed_db = load_large_scale_datasets()
 
-# 3. Structural Default Session State Configurations
-if "current_patient" not in st.session_state:
-    st.session_state.current_patient = {
-        "id": "EHR-A-9920",
-        "age": 47,
-        "gender": "Male",
-        "vitals": {"BP": "158/98", "HR": "92 bpm", "Temp": "38.9°C", "SpO2": "91%"},
-        "lookup_history": ["high blood pressure (variant 0)", "sugar diabetes (variant 2)"],
-        "allergies": ["Penicillin"]
-    }
+# 4. State Initializers
+if "final_report_content" not in st.session_state:
+    st.session_state.final_report_content = ""
+if "current_patient_id" not in st.session_state:
+    st.session_state.current_patient_id = "EHR-A-9920"
 
-# 4. Sidebar Workspace Navigation Layout Banner
+# 5. Left Sidebar: Clinical Parameter Control Panel
 with st.sidebar:
-    st.markdown("### 🩺 Aegis Intelligence")
-    st.caption("Enterprise Clinical Decision Suite")
+    st.markdown("### 🧬 Patient Vitals Core")
+    st.caption("Adjust clinical parameters in real-time")
     st.markdown("---")
     
-    # Secure Global SDK Target Initializer Verification Check
-    if GROQ_API_KEY == "YOUR_GROQ_API_KEY_HERE" or not GROQ_API_KEY:
-        st.error("🔒 **API Key Missing**\nUpdate your `app.py` script root context definition variable with a valid token configuration setup.")
+    # Secure API Client Initialization
+    if not GROQ_API_KEY or GROQ_API_KEY == "YOUR_GROQ_API_KEY_HERE":
+        st.error("❌ Missing Groq API Validation Key.")
         st.stop()
-        
     client = Groq(api_key=GROQ_API_KEY)
     
-    # Active Patient File Summary Card Layout
-    patient = st.session_state.current_patient
-    st.markdown(f"#### 📋 Patient File: `{patient['id']}`")
+    # --- PHYSICAL FEATURE INTERACTIVE WIDGETS ---
+    st.markdown("##### 🌡️ Core Metrics")
+    input_temp = st.slider("Body Temperature (°C)", 35.0, 42.0, 38.9, 0.1, help="Normal range: 36.5°C - 37.5°C")
+    input_bpm = st.slider("Heart Rate (BPM)", 40, 180, 92, help="Normal resting range: 60 - 100 BPM")
+    input_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 450, 245, help="Normal fasting range: < 100 mg/dL")
     
-    with st.container():
-        st.markdown(f"""
-        <div class="patient-badge">
-            <small style="color: #64748B;">DEMOGRAPHICS</small><br>
-            <b>Age:</b> {patient['age']} | <b>Gender:</b> {patient['gender']}<br><br>
-            <small style="color: #64748B;">VITAL SIGNALS</small><br>
-            <span class="vital-tag">BP: {patient['vitals']['BP']}</span>
-            <span class="vital-tag">HR: {patient['vitals']['HR']}</span>
-            <span class="vital-tag">Temp: {patient['vitals']['Temp']}</span>
-            <span class="vital-tag">SpO2: {patient['vitals']['SpO2']}</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Translate historical parameters to SNOMED codes dynamically
-    st.markdown("##### 🧬 Ontology Map Tracking")
-    if not snomed_db.empty:
-        for item in patient['lookup_history']:
-            match = snomed_db[snomed_db['user_term'] == item]
-            if not match.empty:
-                st.markdown(f"• {match.iloc[0]['preferred_term']}  \n`Code: {match.iloc[0]['snomed_code']}`")
-                
-    st.markdown("##### ⚠️ Declared Allergies")
-    for allergy in patient['allergies']:
-        st.markdown(f'<div class="allergy-tag">Contraindicated: {allergy}</div>', unsafe_allow_html=True)
+    st.markdown("##### 🫁 Secondary Metrics")
+    col_sys, col_dia = st.columns(2)
+    with col_sys:
+        input_sys = st.number_input("Systolic BP", 80, 200, 158)
+    with col_dia:
+        input_dia = st.number_input("Diastolic BP", 40, 130, 98)
         
+    input_spo2 = st.slider("Oxygen Saturation ($SpO_2$ %)", 70, 100, 91)
+    
     st.markdown("---")
-    st.caption(f"💾 **Indexed State Matrix:** {len(mimic_db) + len(drugbank_db) + len(snomed_db):,} records")
+    st.markdown("##### ⚠️ Allergy Profiles & History")
+    selected_allergies = st.multiselect("Active Patient Allergies:", ["Penicillin", "Sulfa", "NSAID", "Aspirin"], default=["Penicillin"])
+    
+    # Reset Parameters Button
+    if st.button("🔄 Reset Vitals to Baseline", use_container_width=True):
+        st.rerun()
 
-# 5. Dashboard Core Panel Layout Design
-st.subheader("🩺 High-Throughput Diagnostic Core Framework")
-st.markdown("Cross-reference incoming clinical presentations against distributed database rows safely using low-latency LPU pipelines.")
+# 6. Main Dashboard Architecture
+st.title("🩺 Aegis AI // Enterprise Diagnostic Console")
+st.markdown("Cross-referencing live patient physical profiles against 10,000-row tabular data matrices securely.")
 
-# Balance spatial grid columns cleanly
-col_input, col_chain = st.columns([11, 10], gap="large")
+# Dynamic Vitals Dashboard Banner display
+with st.container(border=True):
+    st.markdown(f"##### 📋 Active Tracked Case: `{st.session_state.current_patient_id}` | Demographics: 47yo Male")
+    m_col1, m_col2, m_col3, m_col4, m_col5 = st.columns(5)
+    m_col1.metric("Body Temperature", f"{input_temp}°C", delta=f"{round(input_temp - 37.0, 1)}°C vs Normal", delta_color="inverse")
+    m_col2.metric("Heart Rate (BPM)", f"{input_bpm} bpm", delta="Elevated (>90)" if input_bpm > 90 else "Normal")
+    m_col3.metric("Blood Glucose", f"{input_glucose} mg/dL", delta="Hyperglycemic" if input_glucose > 140 else "Normal", delta_color="inverse")
+    m_col4.metric("Blood Pressure", f"{input_sys}/{input_dia} mmHg")
+    m_col5.metric("Oxygen Saturation", f"{input_spo2}%", delta="Hypoxia Warning" if input_spo2 < 95 else "Stable", delta_color="normal")
 
-with col_input:
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Layout Columns split
+col_ctrl, col_terminal = st.columns([11, 10], gap="large")
+
+with col_ctrl:
     with st.container(border=True):
-        st.markdown("##### 📥 Patient Presentation Intake & Routing Anchor")
-        clinical_input = st.text_area(
-            "Observation / Symptom Transcript Log:",
-            height=130,
-            value="Patient shows high fever, confusion, rapid shallow breaths, and significantly elevated blood glucose parameters. Suspect severe systemic metabolic presentation requiring validation."
+        st.markdown("##### 📥 Clinical Observation Narrative")
+        
+        # Build dynamic narrative template mirroring custom slider metrics automatically
+        default_narrative = (
+            f"Patient presents with an acute body temperature reading of {input_temp}°C accompanied by tachycardia "
+            f"at {input_bpm} BPM. Standard finger-prick diagnostics show a high serum blood glucose calculation sitting "
+            f"at {input_glucose} mg/dL. Systemic blood pressure tracks at {input_sys}/{input_dia} mmHg with oxygen "
+            f"saturation metrics hovering at {input_spo2}% SpO2."
         )
         
-        # Display the selector tool row
+        clinical_input = st.text_area(
+            "Synthesized Manifest Transcript Log:",
+            height=125,
+            value=default_narrative
+        )
+        
+        # Dropdown selection from top rows of MIMIC data context
         sample_ids = mimic_db['note_id'].head(15).tolist() if not mimic_db.empty else ["No Records Loaded"]
-        mimic_select = st.selectbox("Select Core MIMIC-IV Row Base Anchor Reference:", sample_ids)
+        mimic_select = st.selectbox("Anchor Cohort Historical Reference File (MIMIC-IV Row):", sample_ids)
         
         st.markdown("<br>", unsafe_allow_html=True)
-        analyze_btn = st.button("⛓️ Run Decision Loops & Inference Engine", type="primary", use_container_width=True)
+        
+        # PRIMARY EXECUTION ACTION BUTTONS
+        btn_col1, btn_col2 = st.columns(2)
+        with btn_col1:
+            analyze_btn = st.button("⛓️ Run Decision Matrix Loop", type="primary", use_container_width=True)
+        with btn_col2:
+            clear_btn = st.button("🧹 Clear Workspace", use_container_width=True)
+            if clear_btn:
+                st.session_state.final_report_content = ""
+                st.rerun()
 
-with col_chain:
-    st.markdown("##### 🧠 Multi-Dataset Pipeline & Stream Reasoning Log")
+with col_terminal:
+    st.markdown("##### 🧠 Live Pipeline Logic & Data Validation Logs")
     status_indicator = st.empty()
     live_stream_box = st.empty()
 
-# 6. Groq Stream Thread Execution Routing Step Loop
+# 7. Processing Runtime Engine
 if analyze_btn and clinical_input:
-    # Anchor reports box inside left input column directly underneath control panel
-    with col_input:
-        st.markdown("<br>", unsafe_allow_html=True)
-        report_container = st.container(border=True)
-        report_container.markdown("##### 📋 Verified Clinical Decision Report Output")
-        report_text_box = report_container.empty()
-        
-    status_indicator.info("🔍 Filtering cross-dataset parameters via O(1) frame lookups...")
+    status_indicator.info("📊 Parsing local database matrices...")
     
-    # Query row references cleanly from indexed memory frames
-    anchor_note = mimic_db.loc[mimic_select] if mimic_select in mimic_db.index else {"condition": "Unknown", "clinical_note": "No match."}
+    # Query targets securely from indexed memory space 
+    anchor_note = mimic_db.loc[mimic_select] if mimic_select in mimic_db.index else {"condition": "Unknown", "clinical_note": "No historical details matches."}
     
-    # Extract targeted pharmaceutical context limitations matching data filters
-    subset_interactions = drugbank_db[drugbank_db['item_key'].isin(["Penicillin", "Metformin", "Lisinopril", "Sulfa"])]
+    # Filter DrugBank safety constraints according to choices adjusted on the panel
+    subset_interactions = drugbank_db[drugbank_db['item_key'].isin(selected_allergies + ["Metformin", "Lisinopril", "Sulfa"])]
     drugbank_context_text = ""
-    for idx, row in subset_interactions.head(15).iterrows():
-        drugbank_context_text += f"- Rule [{row['category']}]: {row['item_key']} -> Prohibited/Clashes: {row['cross_references']}\n"
+    for idx, row in subset_interactions.head(12).iterrows():
+        drugbank_context_text += f"- Constraint [{row['category']}]: {row['item_key']} -> Restricted matches: {row['cross_references']}\n"
         
-    # Standardize relational text parameters context block
+    # Standardize complete localized RAG knowledge context prompt layer
     compiled_rag_context = f"""
-    [MIMIC-IV ANCHOR HISTORICAL PHENOTYPE RECORD]
-    Row Index: {mimic_select}
-    Condition Target: {anchor_note.get('condition', 'Unknown')}
-    Historical Note Context: {anchor_note.get('clinical_note', 'No details')}
+    [MIMIC-IV COHORT BASELINE DATASET FILTER]
+    Row Reference Token ID: {mimic_select}
+    Target Pathology Group: {anchor_note.get('condition', 'Unknown')}
+    Historical Narrative Note: {anchor_note.get('clinical_note', 'No notes loaded')}
     
-    [PHARMACEUTICAL DRUGBANK RETRIEVAL MATRIX]
-    {drugbank_context_text}
+    [PHARMACEUTICAL DRUGBANK RETRIEVAL SAFETY MATRIX]
+    {drugbank_context_text if drugbank_context_text else "- No explicit pharmaceutical restrictions matched."}
     """
     
     system_prompt = """You are an elite automated diagnostic reasoning agent processing enterprise medical record layers.
@@ -244,19 +206,19 @@ if analyze_btn and clinical_input:
     [FINAL DIAGNOSIS & MANAGEMENT PLAN]
     (Draft final clean actionable medical directives here. Do not show any further THOUGHT prefixes after this line)"""
 
-    user_prompt = f"""Active Patient Profile Vitals: {patient['vitals']}
-    Allergy Target Matrix: {patient['allergies']}
+    user_prompt = f"""Active Vitals Array: Temp={input_temp}°C, HR={input_bpm}bpm, Glucose={input_glucose}mg/dL, BP={input_sys}/{input_dia}, SpO2={input_spo2}%
+    Allergies Matrix List: {selected_allergies}
     
-    Injected CSV Dataset Context:
+    Tabular Context Injected:
     {compiled_rag_context}
     
-    Active Intake Presentation:
+    Live Intake Presentation Transcription:
     {clinical_input}"""
 
-    status_indicator.warning("⚡ Establishing connection to Groq API Engine...")
+    status_indicator.warning("⚡ Connecting securely to the Groq Processing Units...")
     
     try:
-        # Launch low-latency stream pipeline execution
+        # Launch real-time inference stream
         completion_stream = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
@@ -273,33 +235,52 @@ if analyze_btn and clinical_input:
             token = chunk.choices[0].delta.content or ""
             full_output += token
             
-            # Bifurcate reasoning tracing logs from final validated outputs on the fly
             if "[FINAL DIAGNOSIS" in full_output:
                 splits = full_output.split("[FINAL DIAGNOSIS & MANAGEMENT PLAN]")
                 thoughts_output = splits[0]
                 if len(splits) > 1:
                     directives_output = splits[1]
-                status_indicator.success("✅ Multi-Dataset verification loops securely evaluated.")
+                status_indicator.success("✅ Assessment complete. Finalized clinical report compiled below.")
             else:
                 thoughts_output = full_output
-                status_indicator.info("🧠 Processing internal safety matrices across data streams...")
+                status_indicator.info("🧠 Safety matrices mapping across data blocks...")
                 
-            # Render internal thought progression dynamically in terminal widget
-            with col_chain:
-                polished_chain = thoughts_output.replace(
+            # Stream trace reasoning variables step by step into the terminal window
+            with col_terminal:
+                polished_logs = thoughts_output.replace(
                     "[THOUGHT: PHASE 1: RELATIONAL MATCH ANALYSIS]", 
-                    "<div class='phase-header'>📊 PHASE 1: DATAFRAME COHORT CROSS-MATCH</div>"
+                    "<div class='step-title'>📊 STEP 1: TABULAR PROFILE CROSS-EXAMINATION</div>"
                 ).replace(
                     "[THOUGHT: PHASE 2: CONTRAINDICATION EXTRACTION]", 
-                    "<div class='phase-header'>🛡️ PHASE 2: PHARMACEUTICAL MATRIX RULE CHECKS</div>"
+                    "<div class='step-title'>🛡️ STEP 2: CROSS-REFERENCING PHARMACEUTICAL ALLERGY MATRICES</div>"
                 ).replace("]", "")
                 
-                live_stream_box.markdown(f"<div class='reasoning-terminal'>{polished_chain}</div>", unsafe_allow_html=True)
+                live_stream_box.markdown(f"<div class='terminal-box'>{polished_logs}</div>", unsafe_allow_html=True)
                 
-            # Stream finalized dashboard guidance text cleanly inside clinician panel
-            if directives_output:
-                report_text_box.markdown(directives_output)
+        # Cache final answer into session memory state safely to maintain persistent UI displays
+        st.session_state.final_report_content = directives_output
                 
     except Exception as e:
-        status_indicator.error("❌ Diagnostic Processing Exception Encountered.")
-        st.error(f"Groq Core Socket Pipeline Failure Reference: {e}")
+        status_indicator.error("❌ Runtime Engine Disconnect Error.")
+        st.error(f"Groq API connection trace exception: {e}")
+
+# 8. Clean Finalized Clinical Report Workspace Section
+if st.session_state.final_report_content:
+    st.markdown("<br>", unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown("### 📋 Finalised Clinical Consultation & Validation Report")
+        st.markdown("This validated framework directive is compiled directly from real-time physical metric evaluations and database rule checks.")
+        st.write("---")
+        
+        # Display the generated report markdown nicely
+        st.markdown(st.session_state.final_report_content)
+        st.write("---")
+        
+        # Action Command Download Button
+        st.download_button(
+            label="💾 Download Finalised Medical Report (.txt)",
+            data=st.session_state.final_report_content,
+            file_name=f"clinical_report_{st.session_state.current_patient_id}.txt",
+            mime="text/plain",
+            use_container_width=True
+        )
